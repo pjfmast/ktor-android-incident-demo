@@ -1,1 +1,5 @@
-# Kotlin Toolchain project
+# Kotlin Toolchain project: ktor-android-incident-demo
+modules:
+  - android
+  - server
+  - shared

@@ -8,7 +8,7 @@ skinparam responseMessageBelowArrow true
 autonumber
 
 actor Client as client
-participant "Ktor Server\n(Netty EngineMain)" as server
+participant "Ktor Server\n(embeddedServer Netty)" as server
 participant "ContentNegotiation\n(kotlinx.serialization json)" as json
 participant "Authentication\n(jwt, optional = true)" as auth
 participant "JwtService" as jwt
@@ -25,7 +25,7 @@ activate auth
 alt token present and valid
     auth -> jwt : validate token / load user
     activate jwt
-    jwt --> auth : UserPrincipal(user)
+    jwt --> auth : User (domain model)
     deactivate jwt
     note right of auth : principal is stored on the call
 else no token (anonymous) or invalid token
@@ -42,7 +42,7 @@ activate json
 json --> routes : CreateIncidentRequest
 deactivate json
 
-routes -> routes : call.userId()\n(principal<UserPrincipal>()?.user?.id)
+routes -> routes : call.userId()\n(principal<User>()?.id)
 note right of routes
   userId == null  -> anonymous incident
   userId != null  -> incident is linked to the reporter
@@ -90,7 +90,7 @@ group Error handling (StatusPages)
     deactivate routes
     server -> statusPages : exception
     activate statusPages
-    statusPages --> client : 400 Bad Request\n{ "error": "Invalid request." }
+    statusPages --> client : 400 Bad Request\n{ "message": "Invalid request" }
     deactivate statusPages
     deactivate server
 end
