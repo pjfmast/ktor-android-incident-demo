@@ -6,7 +6,6 @@ import incident.server.users.FakeUserRepository
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.application.*
 import io.ktor.server.testing.*
 import kotlinx.coroutines.runBlocking
 
@@ -29,12 +28,6 @@ fun testDependencies(
     incidentRepository: FakeIncidentRepository = runBlocking { FakeIncidentRepository.withDemoData(userRepository) }
 ): Dependencies = dependencies(jwtConfig, userRepository, incidentRepository)
 
-/**
- * Test application setup helper delegating to the unified Application.module.
- */
-fun Application.testModule(dependencies: Dependencies = testDependencies()) {
-    module(dependencies)
-}
 
 /**
  * Creates an HttpClient configured with JSON content negotiation for typed testing.

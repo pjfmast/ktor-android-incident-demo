@@ -38,7 +38,7 @@ data class AppConfig(
     val jwt: JwtConfig
 )
 
-fun main(args: Array<String> = emptyArray()) {
+fun main() {
     val appConfig = ApplicationConfig("application.conf").getAs<AppConfig>()
 
     DatabaseFactory.init(listOf(UsersTable, IncidentsTable, IncidentImagesTable))
