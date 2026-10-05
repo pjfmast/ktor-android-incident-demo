@@ -7,7 +7,7 @@ import org.jetbrains.exposed.v1.core.statements.UpdateBuilder
 import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insertAndGetId
 import org.jetbrains.exposed.v1.jdbc.selectAll
-import org.jetbrains.exposed.v1.jdbc.update
+import org.jetbrains.exposed.v1.jdbc.upsert
 
 /**
  * Persistent [UserRepository] on top of Exposed (DSL), see [UsersTable].
@@ -69,10 +69,7 @@ class ExposedUserRepository : UserRepository<Long> {
      * users are saved together. Must be called from within a transaction.
      */
     private fun saveInTransaction(user: User): User {
-        val exists = user.id > User.NEW_USER_ID &&
-            UsersTable.selectAll().where { UsersTable.id eq user.id }.count() > 0
-
-        return if (exists) update(user) else insert(user)
+        return if (user.id == User.NEW_USER_ID) insert(user) else upsert(user)
     }
 
     private fun insert(user: User): User {
@@ -82,8 +79,9 @@ class ExposedUserRepository : UserRepository<Long> {
         return user.copy(id = generatedId.value)
     }
 
-    private fun update(user: User): User {
-        UsersTable.update({ UsersTable.id eq user.id }) { row ->
+    private fun upsert(user: User): User {
+        UsersTable.upsert(UsersTable.id) { row ->
+            row[UsersTable.id] = user.id
             row.write(user)
         }
         return user

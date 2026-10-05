@@ -84,10 +84,7 @@ class ExposedIncidentRepository : IncidentRepository<Long> {
      * incidents are saved together. Must be called from within a transaction.
      */
     private fun saveInTransaction(incident: Incident): Incident {
-        val exists = incident.id > Incident.NEW_INCIDENT_ID &&
-                IncidentsTable.selectAll().where { IncidentsTable.id eq incident.id }.count() > 0
-
-        return if (exists) update(incident) else insert(incident)
+        return if (incident.id == Incident.NEW_INCIDENT_ID) insert(incident) else upsert(incident)
     }
 
     private fun insert(incident: Incident): Incident {
@@ -98,8 +95,9 @@ class ExposedIncidentRepository : IncidentRepository<Long> {
         return incident.copy(id = generatedId.value)
     }
 
-    private fun update(incident: Incident): Incident {
-        IncidentsTable.update({ IncidentsTable.id eq incident.id }) { row ->
+    private fun upsert(incident: Incident): Incident {
+        IncidentsTable.upsert(IncidentsTable.id) { row ->
+            row[IncidentsTable.id] = incident.id
             row.write(incident)
         }
         saveImages(incident.id, incident.images)
