@@ -1,0 +1,37 @@
+product: jvm/app
+
+dependencies:
+  - ../shared
+  - $ktor.server.core
+  - $ktor.server.netty
+  - $ktor.server.auth
+  - $ktor.server.auth.jwt
+  - $ktor.server.statusPages
+  - $ktor.server.contentNegotiation
+  - $ktor.server.callLogging
+  - $ktor.server.autoHeadResponse
+  - $ktor.server.rateLimit
+  - $ktor.serialization.kotlinx.json
+  - $libs.logback.classic
+  - $libs.kotlinx.datetime
+  - $libs.exposed.core
+  - $libs.exposed.dao
+  - $libs.exposed.jdbc
+  - $libs.exposed.kotlin.datetime
+  - $libs.h2
+
+test-dependencies:
+  - $ktor.server.testHost
+  - $ktor.client.contentNegotiation
+  - $libs.kotlin.test.junit
+
+settings:
+  jvm:
+    mainClass: incident.server.ApplicationKt
+  kotlin:
+    serialization: json
+    optIns:
+      - io.ktor.utils.io.ExperimentalKtorApi
+  ktor:
+    enabled: true
+    version: 3.6.0

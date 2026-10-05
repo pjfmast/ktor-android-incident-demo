@@ -1,0 +1,13 @@
+product: android/app
+
+dependencies:
+  - ../shared
+
+settings:
+  android:
+    namespace: incident.android
+    applicationId: incident.android
+    versionCode: 1
+    versionName: "1.0.0"
+  kotlin:
+    serialization: json

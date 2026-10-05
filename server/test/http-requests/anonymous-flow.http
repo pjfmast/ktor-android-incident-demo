@@ -1,0 +1,17 @@
+### Check if the API is running (Root endpoint)
+GET http://localhost:8080/
+
+### An anonymous user may only report a new incident, but cannot update
+POST http://localhost:8080/api/incidents
+Content-Type: application/json
+
+{
+  "category": "CRIME",
+  "description": "drugs dealing",
+  "latitude": 51.5888,
+  "longitude": 4.7743,
+  "priority": "HIGH"
+}
+
+### An anonymous user is not authenticated
+GET http://localhost:8080/api/users/me

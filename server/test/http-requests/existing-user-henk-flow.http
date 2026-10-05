@@ -1,0 +1,113 @@
+### STAP 1: Login als Henk en bewaar het kortlevende token (zet om te tseten geldigheid voor 10 seconden)
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "Henk",
+  "password": "pwd"
+}
+
+> {%
+    client.global.set("userHenkToken", response.body.token);
+    client.log("Token ontvangen: " + response.body.token);
+%}
+
+### STAP 2: Direct verzoek uitvoeren (BINNEN 10 seconden) -> Verwacht: 200 OK
+GET http://localhost:8080/api/users/me
+Authorization: Bearer {{userHenkToken}}
+
+> {%
+    client.test("Token is nog geldig: status 200", function() {
+        client.assert(response.status === 200, "Verwachtte 200 OK maar kreeg " + response.status);
+    });
+%}
+
+### PAUZE: Wacht nu handmatig 10 tot 15 seconden totdat het token verlopen is...
+
+### STAP 3: Hetzelfde verzoek opnieuw uitvoeren (NA 5 seconden) -> Verwacht: 401 Unauthorized
+GET http://localhost:8080/api/users/me
+Authorization: Bearer {{userHenkToken}}
+
+> {%
+    client.test("Token is verlopen: status 401 Unauthorized", function() {
+        client.assert(response.status === 401, "Verwachtte 401 Unauthorized maar kreeg " + response.status);
+    });
+%}
+
+### STAP 4: Aantonen dat ook andere endpoints nu direct geblokkeerd worden
+GET http://localhost:8080/api/incidents/my-incidents
+Authorization: Bearer {{userHenkToken}}
+
+> {%
+    client.test("Ook incidenten ophalen mislukt: status 401", function() {
+        client.assert(response.status === 401, "Verwachtte 401 Unauthorized");
+    });
+%}
+
+### Try change role fails: a normal USER cannot promote themself to OFFICIAL, but an ADMIN can
+PUT http://localhost:8080/api/users/2/role
+Content-Type: application/json
+Authorization: Bearer {{userHenkToken}}
+
+{
+  "role": "OFFICIAL"
+}
+
+### Report a new incident
+POST http://localhost:8080/api/incidents
+Content-Type: application/json
+Authorization: Bearer {{userHenkToken}}
+
+{
+  "category": "ENVIRONMENT",
+  "description": "Electricity down in our street",
+  "latitude": 51.5907258900,
+  "longitude": 4.8148889134,
+  "priority": "CRITICAL"
+}
+
+> {%
+    client.global.set("newIncidentByHenk", response.body.id);
+%}
+
+### Update reported incident
+PUT http://localhost:8080/api/incidents/{{newIncidentByHenk}}
+Content-Type: application/json
+Authorization: Bearer {{userHenkToken}}
+
+{
+  "description": "Update: Electricity down in the whole block!"
+}
+
+### Try to change status of own incident fails: this restricted based on the business rules)
+PATCH http://localhost:8080/api/incidents/{{newIncidentByHenk}}/status
+Content-Type: application/json
+Authorization: Bearer {{userHenkToken}}
+
+{
+  "status": "RESOLVED"
+}
+
+### Get all my incidents
+GET http://localhost:8080/api/incidents/my-incidents
+Authorization: Bearer {{userHenkToken}}
+
+### Upload an image to incident 5
+POST http://localhost:8080/api/incidents/{{newIncidentByHenk}}/images
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+Authorization: Bearer {{userHenkToken}}
+
+--WebAppBoundary
+Content-Disposition: form-data; name="image"; filename="kapotte brievenbus.jpg"
+Content-Type: image/jpeg
+
+< ../testimages/kapotte brievenbus.jpeg
+--WebAppBoundary--
+
+### Get all my incidents
+GET http://localhost:8080/api/incidents/my-incidents
+Authorization: Bearer {{userHenkToken}}
+
+### Get an image api/incidents/images
+GET http://localhost:8080/api/incidents/images/incident5-image1.jpg
+Authorization: Bearer {{userHenkToken}}

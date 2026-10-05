@@ -1,0 +1,10 @@
+product:
+  type: lib
+  platforms: [jvm, android]
+
+dependencies:
+  - $libs.kotlinx.datetime
+
+settings:
+  kotlin:
+    serialization: json
