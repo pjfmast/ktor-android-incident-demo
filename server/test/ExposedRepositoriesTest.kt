@@ -75,23 +75,23 @@ class ExposedRepositoriesTest {
             longitude = 4.77,
             priority = Priority.NORMAL,
             status = Status.REPORTED,
-            images = listOf("image1.jpg", "image2.jpg")
+            images = listOf("image1.jpeg", "image2.jpeg")
         )
 
         val inserted = incidentRepository.save(newIncident)
         assertEquals(true, inserted.id > Incident.NEW_INCIDENT_ID)
-        assertEquals(listOf("image1.jpg", "image2.jpg"), inserted.images)
+        assertEquals(listOf("image1.jpeg", "image2.jpeg"), inserted.images)
 
         val foundAfterInsert = incidentRepository.findById(inserted.id)
         assertNotNull(foundAfterInsert)
         assertEquals("Pothole in the street", foundAfterInsert.description)
-        assertEquals(listOf("image1.jpg", "image2.jpg"), foundAfterInsert.images)
+        assertEquals(listOf("image1.jpeg", "image2.jpeg"), foundAfterInsert.images)
 
         // Update via upsert
         val updated = inserted.copy(
             description = "Pothole repaired",
             status = Status.RESOLVED,
-            images = listOf("image3.jpg")
+            images = listOf("image3.jpeg")
         )
         val savedUpdate = incidentRepository.save(updated)
         assertEquals(inserted.id, savedUpdate.id)
@@ -100,6 +100,6 @@ class ExposedRepositoriesTest {
         assertNotNull(foundAfterUpdate)
         assertEquals("Pothole repaired", foundAfterUpdate.description)
         assertEquals(Status.RESOLVED, foundAfterUpdate.status)
-        assertEquals(listOf("image3.jpg"), foundAfterUpdate.images)
+        assertEquals(listOf("image3.jpeg"), foundAfterUpdate.images)
     }
 }

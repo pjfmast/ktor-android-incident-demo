@@ -13,6 +13,7 @@ import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+// TODO: [SSE Stap 8] SSE integratietests uitvoeren via testApplication (autorisatie 401/403 en live events)
 class IncidentSseTest {
 
     @Test

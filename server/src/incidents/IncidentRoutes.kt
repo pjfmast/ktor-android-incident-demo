@@ -68,6 +68,7 @@ fun Route.incidentRoutes(
         get("/paginated") { getIncidentsPaginated(incidentService) }
         patch("/{incidentId}/priority") { changeIncidentPriority(incidentService) }
         patch("/{incidentId}/status") { changeIncidentStatus(incidentService) }
+        // TODO: [SSE Stap 5] SSE endpoint /stream beveiligen voor functionarissen (Role.OFFICIAL)
         sse("/stream") { streamIncidents(incidentService) }
     }
 
@@ -89,6 +90,7 @@ private suspend fun RoutingContext.createIncident(incidentService: IncidentServi
     )
 
     val response = createdIncident.toResponse()
+    // TODO: [SSE Stap 6] Incidentmutaties broadcasten via incidentService.notifyChange(...)
     incidentService.notifyChange(
         IncidentStreamEvent(
             eventType = "INCIDENT_CREATED",
@@ -145,8 +147,9 @@ private suspend fun RoutingContext.uploadIncidentImages(incidentService: Inciden
                         uploadDir.mkdirs()
                     }
 
+                    val normalizedExtension = if (rawExtension == "jpg") "jpeg" else rawExtension
                     nextIncidentImageNr = getNextImageNumber(incidentId, foundIncident.images, nextIncidentImageNr)
-                    val fileName = "incident${incidentId}-image$nextIncidentImageNr.$rawExtension"
+                    val fileName = "incident${incidentId}-image$nextIncidentImageNr.$normalizedExtension"
                     val destinationFile = File(getImageUploadPath(fileName))
 
                     call.application.environment.log.info(
@@ -365,6 +368,7 @@ private suspend fun RoutingContext.updateIncident(incidentService: IncidentServi
     call.respond(HttpStatusCode.OK, response)
 }
 
+// TODO: [SSE Stap 7] Stream-handler bouwen met custom 2s heartbeat (Ktor 3.5+) en events-collector
 private suspend fun ServerSSESession.streamIncidents(incidentService: IncidentService) {
     heartbeat {
         period = 1.seconds

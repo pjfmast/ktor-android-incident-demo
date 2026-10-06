@@ -92,13 +92,13 @@ Authorization: Bearer {{userHenkToken}}
 GET http://localhost:8080/api/incidents/my-incidents
 Authorization: Bearer {{userHenkToken}}
 
-### Upload an image to incident 5
+### Upload an image to the reported incident
 POST http://localhost:8080/api/incidents/{{newIncidentByHenk}}/images
 Content-Type: multipart/form-data; boundary=WebAppBoundary
 Authorization: Bearer {{userHenkToken}}
 
 --WebAppBoundary
-Content-Disposition: form-data; name="image"; filename="kapotte brievenbus.jpg"
+Content-Disposition: form-data; name="image"; filename="kapotte brievenbus.jpeg"
 Content-Type: image/jpeg
 
 < ../testimages/kapotte brievenbus.jpeg
@@ -109,5 +109,5 @@ GET http://localhost:8080/api/incidents/my-incidents
 Authorization: Bearer {{userHenkToken}}
 
 ### Get an image api/incidents/images
-GET http://localhost:8080/api/incidents/images/incident5-image1.jpg
+GET http://localhost:8080/api/incidents/images/incident5-image1.jpeg
 Authorization: Bearer {{userHenkToken}}

@@ -82,6 +82,7 @@ fun Application.module(dependencies: Dependencies) {
         json()
     }
 
+    // TODO: [SSE Stap 2] Ktor Server SSE plugin registreren via install(SSE)
     install(SSE)
 
     // Install route modules with explicit dependencies (no DI container)

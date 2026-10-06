@@ -83,8 +83,8 @@ Authorization: Bearer {{newUserToken}}
 GET http://localhost:8080/api/incidents/my-incidents
 Authorization: Bearer {{newUserToken}}
 
-### Update existing incident 5
-PUT http://localhost:8080/api/incidents/16
+### Update reported incident
+PUT http://localhost:8080/api/incidents/{{newIncidentByUser}}
 Content-Type: application/json
 Authorization: Bearer {{newUserToken}}
 
@@ -135,6 +135,28 @@ Content-Type: image/jpeg
 GET http://localhost:8080/api/incidents/my-incidents
 Authorization: Bearer {{newUserToken}}
 
-### Get an image api/incidents/images
+### Get the reported incident to inspect uploaded images dynamically
+GET http://localhost:8080/api/incidents/{{newIncidentByUser}}
+Authorization: Bearer {{newUserToken}}
+
+> {%
+    if (response.body.images && response.body.images.length > 0) {
+        client.global.set("firstUploadedImage", response.body.images[0]);
+    }
+%}
+
+### Get an image of the reported incident dynamically
+GET http://localhost:8080/api/incidents/images/{{firstUploadedImage}}
+Authorization: Bearer {{newUserToken}}
+
+### Get an image of the reported incident statically
+GET http://localhost:8080/api/incidents/images/incident14-image1.jpeg
+Authorization: Bearer {{newUserToken}}
+
+### Get an existing static image (Incident 5)
 GET http://localhost:8080/api/incidents/images/incident5-image1.jpeg
+Authorization: Bearer {{newUserToken}}
+
+### Get an unknown image returns 404 Not Found
+GET http://localhost:8080/api/incidents/images/unknown.jpeg
 Authorization: Bearer {{newUserToken}}

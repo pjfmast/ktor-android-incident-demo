@@ -55,6 +55,7 @@ suspend fun main(args: Array<String>) {
         var pulse = false
         val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
 
+        // TODO: [SSE Stap 9] SSE stream consumeren in Ktor Client (CIO) met heartbeat en incident-verwerking
         client.serverSentEvents(
             urlString = "http://localhost:8080/api/incidents/stream",
             request = {

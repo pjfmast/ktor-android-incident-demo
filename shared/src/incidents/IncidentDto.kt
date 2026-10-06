@@ -72,6 +72,7 @@ data class IncidentResponse(
     val id: Long = 0L
 )
 
+// TODO: [SSE Stap 3] Gedeeld datamodel definiëren voor stream-events (IncidentStreamEvent)
 @Serializable
 data class IncidentStreamEvent(
     val eventType: String,

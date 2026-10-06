@@ -14,6 +14,7 @@ import kotlin.io.path.deleteIfExists
 class IncidentService(
     private val incidentRepository: IncidentRepository<Long>,
 ) {
+    // TODO: [SSE Stap 4] In-memory event bus inrichten via MutableSharedFlow (buffer = 64, replay = 0)
     private val _events = MutableSharedFlow<IncidentStreamEvent>(extraBufferCapacity = 64)
     val events: SharedFlow<IncidentStreamEvent> = _events.asSharedFlow()
 
