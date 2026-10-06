@@ -71,3 +71,9 @@ data class IncidentResponse(
     val isAnonymous: Boolean,
     val id: Long = 0L
 )
+
+@Serializable
+data class IncidentStreamEvent(
+    val eventType: String,
+    val incident: IncidentResponse
+)

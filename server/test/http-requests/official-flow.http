@@ -69,3 +69,8 @@ Authorization: Bearer {{officialToken}}
 ### Get paginated incidents list
 GET http://localhost:8080/api/incidents/paginated?page=2&pageSize=3
 Authorization: Bearer {{officialToken}}
+
+### Live SSE incident dispatch stream for officials (receives heartbeats every 2s & live mutations)
+GET http://localhost:8080/api/incidents/stream
+Authorization: Bearer {{officialToken}}
+Accept: text/event-stream

@@ -1,5 +1,6 @@
 # Kotlin Toolchain project: ktor-android-incident-demo
 modules:
   - android
+  - dashboard
   - server
   - shared

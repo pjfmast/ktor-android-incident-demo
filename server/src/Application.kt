@@ -21,6 +21,7 @@ import io.ktor.server.plugins.ratelimit.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.sse.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import org.slf4j.event.Level
@@ -80,6 +81,8 @@ fun Application.module(dependencies: Dependencies) {
     install(ContentNegotiation) {
         json()
     }
+
+    install(SSE)
 
     // Install route modules with explicit dependencies (no DI container)
     authModule(dependencies.jwtService)

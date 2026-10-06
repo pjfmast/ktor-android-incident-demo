@@ -11,6 +11,7 @@ dependencies:
   - $ktor.server.callLogging
   - $ktor.server.autoHeadResponse
   - $ktor.server.rateLimit
+  - $libs.ktor.server.sse
   - $ktor.serialization.kotlinx.json
   - $libs.logback.classic
   - $libs.kotlinx.datetime

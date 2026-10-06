@@ -110,11 +110,12 @@ class ExposedIncidentRepository : IncidentRepository<Long> {
      */
     private fun saveImages(incidentId: Long, images: List<String>) {
         IncidentImagesTable.deleteWhere { IncidentImagesTable.incident eq incidentId }
-        images.forEachIndexed { index, fileName ->
-            IncidentImagesTable.insert { row ->
-                row[IncidentImagesTable.incident] = incidentId
-                row[IncidentImagesTable.position] = index
-                row[IncidentImagesTable.fileName] = fileName
+
+        if (images.isNotEmpty()) {
+            IncidentImagesTable.batchInsert(images.withIndex()) { (index, fileName) ->
+                this[IncidentImagesTable.incident] = incidentId
+                this[IncidentImagesTable.position] = index
+                this[IncidentImagesTable.fileName] = fileName
             }
         }
     }

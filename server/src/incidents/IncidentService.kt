@@ -1,13 +1,25 @@
 package incident.server.incidents
 
 import incident.server.utils.currentInstant
+import incident.shared.incidents.IncidentStreamEvent
 import incident.shared.incidents.Status
-import java.nio.file.Files.deleteIfExists
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.withContext
 import kotlin.io.path.Path
+import kotlin.io.path.deleteIfExists
 
 class IncidentService(
     private val incidentRepository: IncidentRepository<Long>,
 ) {
+    private val _events = MutableSharedFlow<IncidentStreamEvent>(extraBufferCapacity = 64)
+    val events: SharedFlow<IncidentStreamEvent> = _events.asSharedFlow()
+
+    suspend fun notifyChange(event: IncidentStreamEvent) {
+        _events.emit(event)
+    }
     suspend fun findAll(): List<Incident> =
         incidentRepository.findAll()
 
@@ -29,9 +41,11 @@ class IncidentService(
         return if (foundIncident != null) {
             incidentRepository.delete(incidentId)
             // also remove all images of this incident
-            foundIncident.images.forEach { imageFile ->
-                val imageToDelete = Path(getImageUploadPath(imageFile))
-                deleteIfExists(imageToDelete)
+            withContext(Dispatchers.IO) {
+                for (imageFile in foundIncident.images) {
+                    val imageToDelete = Path(getImageUploadPath(imageFile))
+                    imageToDelete.deleteIfExists()
+                }
             }
             true
         } else false

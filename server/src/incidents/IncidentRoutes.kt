@@ -19,10 +19,14 @@ import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.sse.*
 import io.ktor.server.util.*
+import io.ktor.sse.*
 import io.ktor.util.cio.*
 import io.ktor.utils.io.*
+import kotlinx.serialization.json.Json
 import java.io.File
+import kotlin.time.Duration.Companion.seconds
 
 // For now, only light validation that these files are images.
 // In real production, be sure to validate the file contents later with Magic Bytes validation and decompression.
@@ -64,6 +68,7 @@ fun Route.incidentRoutes(
         get("/paginated") { getIncidentsPaginated(incidentService) }
         patch("/{incidentId}/priority") { changeIncidentPriority(incidentService) }
         patch("/{incidentId}/status") { changeIncidentStatus(incidentService) }
+        sse("/stream") { streamIncidents(incidentService) }
     }
 
     // Routes for any authenticated user; ownership is checked per incident
@@ -83,11 +88,19 @@ private suspend fun RoutingContext.createIncident(incidentService: IncidentServi
         createIncidentRequest.toModel(Incident.NEW_INCIDENT_ID, userId)
     )
 
+    val response = createdIncident.toResponse()
+    incidentService.notifyChange(
+        IncidentStreamEvent(
+            eventType = "INCIDENT_CREATED",
+            incident = response
+        )
+    )
+
     call.response.header(
         name = "id",
         value = createdIncident.id.toString()
     )
-    call.respond(HttpStatusCode.Created, createdIncident.toResponse())
+    call.respond(HttpStatusCode.Created, response)
 }
 
 private suspend fun RoutingContext.uploadIncidentImages(incidentService: IncidentService) {
@@ -222,7 +235,14 @@ private suspend fun RoutingContext.changeIncidentPriority(incidentService: Incid
     )
 
     val savedIncident = incidentService.save(updatedIncident)
-    call.respond(HttpStatusCode.OK, savedIncident.toResponse())
+    val response = savedIncident.toResponse()
+    incidentService.notifyChange(
+        IncidentStreamEvent(
+            eventType = "INCIDENT_PRIORITY_CHANGED",
+            incident = response
+        )
+    )
+    call.respond(HttpStatusCode.OK, response)
 }
 
 private suspend fun RoutingContext.changeIncidentStatus(incidentService: IncidentService) {
@@ -233,7 +253,14 @@ private suspend fun RoutingContext.changeIncidentStatus(incidentService: Inciden
         ?: throw NotFoundException()
 
     val updatedIncident = incidentService.changeStatus(foundIncident, changeStatusRequest.status)
-    call.respond(HttpStatusCode.OK, updatedIncident.toResponse())
+    val response = updatedIncident.toResponse()
+    incidentService.notifyChange(
+        IncidentStreamEvent(
+            eventType = "INCIDENT_STATUS_CHANGED",
+            incident = response
+        )
+    )
+    call.respond(HttpStatusCode.OK, response)
 }
 
 private suspend fun RoutingContext.getMyIncidents(incidentService: IncidentService) {
@@ -281,11 +308,20 @@ private suspend fun RoutingContext.deleteIncident(incidentService: IncidentServi
         throw NotFoundException("Incident with id $incidentId not found")
     }
 
+    val response = foundIncident.toResponse()
+
     // 2. Execute the delete operation and handle the result explicitly
     val deleteIsSuccess = incidentService.delete(incidentId)
     if (!deleteIsSuccess) {
         throw IllegalStateException("Failed to delete incident with id $incidentId")
     }
+
+    incidentService.notifyChange(
+        IncidentStreamEvent(
+            eventType = "INCIDENT_DELETED",
+            incident = response
+        )
+    )
 
     call.respond(HttpStatusCode.NoContent)
 }
@@ -319,7 +355,36 @@ private suspend fun RoutingContext.updateIncident(incidentService: IncidentServi
     )
 
     val savedIncident = incidentService.save(updatedIncident)
-    call.respond(HttpStatusCode.OK, savedIncident.toResponse())
+    val response = savedIncident.toResponse()
+    incidentService.notifyChange(
+        IncidentStreamEvent(
+            eventType = "INCIDENT_UPDATED",
+            incident = response
+        )
+    )
+    call.respond(HttpStatusCode.OK, response)
+}
+
+private suspend fun ServerSSESession.streamIncidents(incidentService: IncidentService) {
+    heartbeat {
+        period = 1.seconds
+        eventProvider = {
+            ServerSentEvent(
+                event = "heartbeat",
+                data = "ts=${currentInstant()}"
+            )
+        }
+    }
+
+    incidentService.events.collect { streamEvent ->
+        send(
+            ServerSentEvent(
+                id = streamEvent.incident.id.toString(),
+                event = streamEvent.eventType,
+                data = Json.encodeToString(streamEvent)
+            )
+        )
+    }
 }
 
 fun CreateIncidentRequest.toModel(incidentId: Long, userId: Long?): Incident =
