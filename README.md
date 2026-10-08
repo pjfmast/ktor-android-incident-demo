@@ -40,6 +40,10 @@ This project uses the official Kotlin Toolchain wrapper (no Gradle installation 
 # Run the backend server (starts on http://localhost:8080)
 ./kotlin run -m server       # Linux / macOS
 .\kotlin.bat run -m server   # Windows
+
+# Run the live SSE incident dashboard
+./kotlin run -m dashboard    # Linux / macOS
+.\kotlin.bat run -m dashboard # Windows
 ```
 
 ---
