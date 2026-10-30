@@ -2,12 +2,62 @@ product: android/app
 
 dependencies:
   - ../shared
+  - androidx.core:core-ktx:1.18.0
+  - androidx.lifecycle:lifecycle-runtime-ktx:2.11.0
+  - androidx.activity:activity-compose:1.13.0
+
+  # Compose & UI
+  - androidx.compose.ui:ui:1.12.1
+  - androidx.compose.ui:ui-graphics:1.12.1
+  - androidx.compose.ui:ui-tooling-preview:1.12.1
+  - androidx.compose.material3:material3:1.3.1
+
+  # Navigation3 & Lifecycle Navigation3
+  - androidx.navigation3:navigation3-runtime:1.2.0
+  - androidx.navigation3:navigation3-ui:1.2.0
+  - androidx.lifecycle:lifecycle-viewmodel-navigation3:2.11.0
+  - androidx.compose.material3.adaptive:adaptive-navigation3:1.3.0
+
+  # Koin
+  - io.insert-koin:koin-core:4.0.0
+  - io.insert-koin:koin-android:4.0.0
+  - io.insert-koin:koin-compose:4.0.0
+  - io.insert-koin:koin-compose-viewmodel:4.0.0
+
+  # Ktor Client
+  - $libs.ktor.client.core
+  - $libs.ktor.client.cio
+  - $libs.ktor.client.content.negotiation
+  - $libs.ktor.serialization.kotlinx.json
+
+  # DataStore
+  - androidx.datastore:datastore-preferences:1.1.1
+
+  # Coil
+  - $libs.coil.compose
+  - $libs.coil.network.okhttp
+
+  # MapLibre & Location
+  - org.maplibre.compose:maplibre-compose:0.20.0
+  - org.maplibre.compose:maplibre-compose-runtime-vulkan-android:0.20.0
+
+  - $libs.kotlinx.datetime
+
+test-dependencies:
+  - junit:junit:4.13.2
 
 settings:
   android:
     namespace: incident.android
     applicationId: incident.android
     versionCode: 1
-    versionName: "1.0.0"
+    versionName: "1.0"
+    compileSdk: 37
+    minSdk: 26
+    targetSdk: 37
+    abiFilters: [ arm64-v8a, armeabi-v7a, x86_64 ]
+  compose: enabled
   kotlin:
     serialization: json
+    optIns:
+      - androidx.compose.material3.ExperimentalMaterial3Api
