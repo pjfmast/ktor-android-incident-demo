@@ -3,6 +3,7 @@
 import incident.android.data.model.ApiResult
 import incident.android.data.model.ImageUploadResponse
 import incident.android.data.store.TokenPreferences
+import incident.android.di.NetworkConfig
 import incident.android.util.performRequest
 import incident.shared.core.PaginatedItemResponse
 import incident.shared.incidents.*
@@ -15,7 +16,7 @@ import java.io.File
 class IncidentApi(
     private val client: HttpClient,
     private val tokenPreferences: TokenPreferences,
-    private val baseUrl: String = "http://10.0.2.2:8080/api"
+    private val baseUrl: String = "${NetworkConfig.BASE_URL}/api"
 ) {
     suspend fun getMyIncidents(): ApiResult<List<IncidentResponse>> =
         performRequest(tokenPreferences) { token ->

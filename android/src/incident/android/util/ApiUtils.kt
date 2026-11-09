@@ -1,5 +1,6 @@
 ﻿package incident.android.util
 
+import android.util.Log
 import incident.android.data.model.ApiResult
 import incident.android.data.store.TokenPreferences
 import io.ktor.client.call.*
@@ -34,10 +35,13 @@ suspend inline fun <reified T> performRequest(
             else -> ApiResult.HttpError(response.status.value, response.status.description)
         }
     } catch (e: SocketTimeoutException) {
+        Log.e("ApiUtils", "Request timeout", e)
         ApiResult.Timeout(e)
     } catch (e: IOException) {
+        Log.e("ApiUtils", "Network error", e)
         ApiResult.NetworkError(e)
     } catch (e: Exception) {
+        Log.e("ApiUtils", "Unexpected error", e)
         ApiResult.Unknown(e)
     }
 }

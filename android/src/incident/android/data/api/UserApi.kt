@@ -2,6 +2,7 @@
 
 import incident.android.data.model.ApiResult
 import incident.android.data.store.TokenPreferences
+import incident.android.di.NetworkConfig
 import incident.android.util.performRequest
 import incident.shared.incidents.IncidentResponse
 import incident.shared.users.*
@@ -11,9 +12,9 @@ import io.ktor.http.*
 
 class UserApi(
     private val client: HttpClient,
-    private val tokenPreferences: TokenPreferences
+    private val tokenPreferences: TokenPreferences,
+    private val baseUrl: String = "${NetworkConfig.BASE_URL}/api/users"
 ) {
-    private val baseUrl = "http://10.0.2.2:8080/api/users"
 
     // Public endpoint
     suspend fun register(

@@ -2,7 +2,7 @@ product: android/app
 
 dependencies:
   - ../shared
-  - androidx.core:core-ktx:1.18.0
+  - androidx.core:core-ktx:1.19.1
   - androidx.lifecycle:lifecycle-runtime-ktx:2.11.0
   - androidx.activity:activity-compose:1.13.0
 
@@ -10,7 +10,7 @@ dependencies:
   - androidx.compose.ui:ui:1.12.1
   - androidx.compose.ui:ui-graphics:1.12.1
   - androidx.compose.ui:ui-tooling-preview:1.12.1
-  - androidx.compose.material3:material3:1.3.1
+  - androidx.compose.material3:material3:1.4.0
 
   # Navigation3 & Lifecycle Navigation3
   - androidx.navigation3:navigation3-runtime:1.2.0
@@ -19,19 +19,19 @@ dependencies:
   - androidx.compose.material3.adaptive:adaptive-navigation3:1.3.0
 
   # Koin
-  - io.insert-koin:koin-core:4.0.0
-  - io.insert-koin:koin-android:4.0.0
-  - io.insert-koin:koin-compose:4.0.0
-  - io.insert-koin:koin-compose-viewmodel:4.0.0
+  - io.insert-koin:koin-core:4.2.2
+  - io.insert-koin:koin-android:4.2.2
+  - io.insert-koin:koin-compose:4.2.2
+  - io.insert-koin:koin-compose-viewmodel:4.2.2
 
   # Ktor Client
   - $libs.ktor.client.core
-  - $libs.ktor.client.cio
+  - $libs.ktor.client.okhttp
   - $libs.ktor.client.content.negotiation
   - $libs.ktor.serialization.kotlinx.json
 
   # DataStore
-  - androidx.datastore:datastore-preferences:1.1.1
+  - androidx.datastore:datastore-preferences:1.3.0
 
   # Coil
   - $libs.coil.compose
@@ -58,6 +58,6 @@ settings:
     abiFilters: [ arm64-v8a, armeabi-v7a, x86_64 ]
   compose: enabled
   kotlin:
-    serialization: json
+    serialization: enabled
     optIns:
       - androidx.compose.material3.ExperimentalMaterial3Api

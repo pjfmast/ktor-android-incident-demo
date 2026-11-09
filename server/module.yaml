@@ -31,9 +31,9 @@ settings:
   jvm:
     mainClass: incident.server.ApplicationKt
   kotlin:
-    serialization: json
+    serialization: enabled
     optIns:
       - io.ktor.utils.io.ExperimentalKtorApi
   ktor:
     enabled: true
-    version: 3.6.0
+    version: 3.6.1
